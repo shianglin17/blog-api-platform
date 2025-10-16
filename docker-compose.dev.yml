@@ -1,0 +1,10 @@
+services:
+  app:
+    image: blog-api
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./.env:/app/.env
+    environment:
+      - APP_ENV=local
+      - APP_DEBUG=true
