@@ -46,15 +46,28 @@
  - User (HasRole trait)
  - Role (設定該角色可以看到的前台分類、文章，預設角色：`admin`, `normal`, `silver`, `gold`)
  - Filament Role Resource 需支援階層式勾選分類/文章權限，勾分類時批量賦予其底下文章權限
+ - **後台權限**：只有 `admin` 角色可以登入 Filament 後台
 
 ### migration, seeder
  - migration
    - sanctum, spatie/laravel-permission 套件的 migration 先跑
    - category, article, refresh_tokens
  - seeder
-   - 建立 CategorySeeder, ArticleSeeder, RolePermissionSeeder, DatabaseSeeder
-   - DatabaseSeeder::call([CategorySeeder, ArticleSeeder, RolePermissionSeeder])
-   - DatabaseSeeder::run(每個 Role 建立一個 User)
+   - 建立 CategorySeeder, ArticleSeeder, RolePermissionSeeder, UserSeeder, DatabaseSeeder
+   - **測試資料規劃**：
+     - 3個分類：前端、後端、生活
+     - 每個分類3篇文章，共9篇
+     - 4個角色對應權限：
+       - `normal`: 可看1個分類的所有文章（前端）
+       - `silver`: 可看2個分類的所有文章（前端、後端）
+       - `gold`: 可看3個分類的所有文章（前端、後端、生活）
+       - `admin`: 可看3個分類的所有文章 + 後台管理權限
+   - **執行順序**：
+     1. CategorySeeder（建立分類）
+     2. ArticleSeeder（建立文章，依賴 Category）
+     3. RolePermissionSeeder（建立角色、權限，並賦予角色對應的文章權限）
+     4. UserSeeder（建立用戶，每個 Role 建立一個對應的 User）
+   - DatabaseSeeder::call([CategorySeeder, ArticleSeeder, RolePermissionSeeder, UserSeeder])
 ---
 ## 後台使用 filament 指令建立 filament Resource
  - Resource: Categories, Articles, Users, Roles
