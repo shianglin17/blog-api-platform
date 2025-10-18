@@ -4,8 +4,10 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\LoginRequest;
+use App\Http\Requests\RefreshTokenRequest;
 use App\Http\Responses\ApiResponse;
 use App\Services\AuthService;
+use Illuminate\Auth\AuthenticationException;
 use Illuminate\Http\JsonResponse;
 
 class AuthController extends Controller
@@ -15,6 +17,9 @@ class AuthController extends Controller
     ) {
     }
 
+    /**
+     * @throws AuthenticationException
+     */
     public function login(LoginRequest $request): JsonResponse
     {
         $credentials = $request->validated();
@@ -24,14 +29,6 @@ class AuthController extends Controller
             $credentials['password']
         );
 
-        if (!$result) {
-            return ApiResponse::error(
-                message: 'Invalid email or password',
-                httpStatus: 401,
-                code: '0401'
-            );
-        }
-
         return ApiResponse::success(
             data: [
                 'access_token' => $result['access_token'],
@@ -39,6 +36,25 @@ class AuthController extends Controller
                 'token_type' => 'Bearer',
             ],
             message: 'Login successful'
+        );
+    }
+
+    /**
+     * @throws AuthenticationException
+     */
+    public function refresh(RefreshTokenRequest $request): JsonResponse
+    {
+        $refreshToken = $request->validated()['refresh_token'];
+
+        $result = $this->authService->refresh($refreshToken);
+
+        return ApiResponse::success(
+            data: [
+                'access_token' => $result['access_token'],
+                'refresh_token' => $result['refresh_token'],
+                'token_type' => 'Bearer',
+            ],
+            message: 'Token refreshed successfully'
         );
     }
 }

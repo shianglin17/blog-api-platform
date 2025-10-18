@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Responses\ApiResponse;
+use Illuminate\Auth\AuthenticationException;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
@@ -19,10 +20,20 @@ return Application::configure(basePath: dirname(__DIR__))
         //
     })
     ->withExceptions(function (Exceptions $exceptions): void {
+        $exceptions->render(function (AuthenticationException $e, Request $request) {
+            if ($request->is('api/*')) {
+                return ApiResponse::error(
+                    message: 'Unauthenticated',
+                    httpStatus: 401,
+                    code: '0401'
+                );
+            }
+        });
+
         $exceptions->render(function (AccessDeniedHttpException $e, Request $request) {
             if ($request->is('api/*')) {
                 return ApiResponse::error(
-                    message: 'Access denied',
+                    message: 'Forbidden',
                     httpStatus: 403,
                     code: '0403'
                 );
@@ -42,7 +53,7 @@ return Application::configure(basePath: dirname(__DIR__))
         $exceptions->render(function (\Throwable $e, Request $request) {
             if ($request->is('api/*')) {
                 return ApiResponse::error(
-                    message: $e->getMessage(),
+                    message: 'Internal Server Error',
                     httpStatus: 500,
                     code: '0500'
                 );
