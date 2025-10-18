@@ -1,19 +1,11 @@
 <?php
 
-namespace Tests\Feature;
+namespace Tests\Feature\Auth;
 
-use Illuminate\Foundation\Testing\RefreshDatabase;
-use Tests\TestCase;
+use Tests\ApiTestCase;
 
-class LoginTest extends TestCase
+class LoginTest extends ApiTestCase
 {
-    use RefreshDatabase;
-
-    protected function setUp(): void
-    {
-        parent::setUp();
-        $this->seed();
-    }
 
     public function test_user_can_login_with_valid_credentials(): void
     {
@@ -51,9 +43,7 @@ class LoginTest extends TestCase
             'password' => 'wrong-password',
         ]);
 
-        $response->assertStatus(401)
-            ->assertJsonStructure(['success', 'code', 'message'])
-            ->assertJson(['success' => false, 'code' => '0401']);
+        $this->assertApiError($response, 401, '0401');
 
         $this->assertDatabaseCount('refresh_tokens', 0);
     }
@@ -65,17 +55,13 @@ class LoginTest extends TestCase
             'password' => 'password',
         ]);
 
-        $response->assertStatus(401)
-            ->assertJsonStructure(['success', 'code', 'message'])
-            ->assertJson(['success' => false, 'code' => '0401']);
+        $this->assertApiError($response, 401, '0401');
     }
 
     public function test_login_requires_email_and_password(): void
     {
         $response = $this->postJson('/api/login', []);
 
-        $response->assertStatus(422)
-            ->assertJsonStructure(['success', 'code', 'message'])
-            ->assertJson(['success' => false, 'code' => '0422']);
+        $this->assertApiError($response, 422, '0422');
     }
 }
