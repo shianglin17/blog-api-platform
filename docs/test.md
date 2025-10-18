@@ -11,46 +11,48 @@
 - 測試隔離 - 每個測試獨立運行，不依賴其他測試
 - 完整 assert - 檢查狀態碼 + JSON 結構 + 資料內容
 - 測試正反兩面 - 成功場景 + 失敗場景（401, 403, 422 等）
+- **測試檔案組織** - 一個 API 一個測試檔案，使用模組分類（資料夾）
 
 ---
 
-## 模組 1：認證 (AuthTest.php)
+## 模組 1：認證 (Feature/Auth/)
 
-### API: POST /api/login
+### LoginTest.php - POST /api/login
 **功能**：用戶登入獲取 token
 
 測試案例：
-- [ ] 正確憑據可以登入（200，返回 token 和 user 資訊）
-- [ ] 錯誤密碼無法登入（401，返回錯誤訊息）
-- [ ] 不存在的信箱無法登入（401）
-- [ ] 缺少必填欄位返回驗證錯誤（422）
+- [x] 正確憑據可以登入（200，返回 access_token, refresh_token, token_type）
+- [x] 錯誤密碼無法登入（401，返回錯誤訊息）
+- [x] 不存在的信箱無法登入（401）
+- [x] 缺少必填欄位返回驗證錯誤（422）
 
-### API: GET /api/profile
+### ProfileTest.php - GET /api/profile
 **功能**：獲取當前用戶資料
 
 測試案例：
 - [ ] 認證用戶可以獲取個人資料（200，返回 name, email, roles）
 - [ ] 未認證用戶無法訪問（401）
 
-### API: POST /api/refresh
+### RefreshTokenTest.php - POST /api/refresh-token
 **功能**：刷新訪問 token
 
 測試案例：
-- [ ] 可以刷新 token（200，返回新 token）
-- [ ] 無效 token 無法刷新（401）
+- [ ] 有效 refresh_token 可以刷新（200，返回新的 access_token）
+- [ ] 無效 refresh_token 無法刷新（401）
+- [ ] 過期 refresh_token 無法刷新（401）
 
-### API: POST /api/logout
+### LogoutTest.php - POST /api/logout
 **功能**：登出並刪除 token
 
 測試案例：
-- [ ] 可以登出（200，token 從資料庫刪除）
+- [ ] 認證用戶可以登出（200，refresh_token 從資料庫刪除）
 - [ ] 未認證用戶無法登出（401）
 
 ---
 
-## 模組 2：文章 (ArticleTest.php)
+## 模組 2：文章 (Feature/Article/)
 
-### API: GET /api/articles
+### ArticleListTest.php - GET /api/articles
 **功能**：獲取用戶有權限的文章列表
 
 測試案例：
@@ -59,7 +61,7 @@
 - [ ] 未認證用戶無法訪問（401）
 - [ ] 無權限的用戶返回空列表（200，空陣列）
 
-### API: GET /api/articles/{slug}
+### ArticleDetailTest.php - GET /api/articles/{slug}
 **功能**：獲取文章詳情
 
 測試案例：
@@ -70,9 +72,9 @@
 
 ---
 
-## 模組 3：分類 (CategoryTest.php)
+## 模組 3：分類 (Feature/Category/)
 
-### API: GET /api/categories
+### CategoryListTest.php - GET /api/categories
 **功能**：獲取所有分類及用戶可訪問文章計數
 
 測試案例：
@@ -80,7 +82,7 @@
 - [ ] 結構正確（包含 id, name, slug, accessible_articles_count）
 - [ ] 未認證用戶無法訪問（401）
 
-### API: GET /api/categories/{slug}
+### CategoryDetailTest.php - GET /api/categories/{slug}
 **功能**：獲取分類詳情及該分類下用戶可訪問的文章
 
 測試案例：
@@ -89,20 +91,3 @@
 - [ ] 文章列表支持分頁
 - [ ] 分類不存在返回 404
 
----
-
-## 模組 4：權限 (PermissionTest.php)
-
-### 功能：ArticleObserver 權限管理
-
-測試案例：
-- [ ] 創建文章時自動創建權限（Article::create(['slug' => 'test',...]) 後，Permission 表中存在 'article.test'）
-- [ ] 更新文章 slug 時權限同步更新（slug 從 'old' 更新到 'new'，權限名稱也更新）
-- [ ] 刪除文章時權限同步刪除（刪除文章後，對應權限也被刪除）
-
-### 功能：角色和權限分配
-
-測試案例：
-- [ ] 可以給角色分配文章權限（$role->givePermissionTo('article.test') 成功）
-- [ ] 用戶通過角色繼承權限（用戶分配角色後可以訪問該角色有權限的文章）
-- [ ] 可以直接給用戶分配權限（$user->givePermissionTo('article.test') 成功）
