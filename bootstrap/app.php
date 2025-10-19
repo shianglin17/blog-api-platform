@@ -2,12 +2,14 @@
 
 use App\Http\Responses\ApiResponse;
 use Illuminate\Auth\AuthenticationException;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
 use Illuminate\Http\Request;
 use Illuminate\Validation\ValidationException;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 return Application::configure(basePath: dirname(__DIR__))
     ->withRouting(
@@ -46,6 +48,17 @@ return Application::configure(basePath: dirname(__DIR__))
                     message: $e->getMessage(),
                     httpStatus: 422,
                     code: '0422'
+                );
+            }
+        });
+
+        // ModelNotFoundException 會被轉換成 NotFoundHttpException
+        $exceptions->render(function (NotFoundHttpException $e, Request $request) {
+            if ($request->is('api/*')) {
+                return ApiResponse::error(
+                    message: 'Not Found',
+                    httpStatus: 404,
+                    code: '0404'
                 );
             }
         });

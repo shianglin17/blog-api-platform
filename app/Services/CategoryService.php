@@ -24,6 +24,15 @@ class CategoryService
             ->paginate($perPage);
     }
 
+    public function getCategory(User $user, string $slug): Category
+    {
+        $accessibleSlugs = $this->getAccessibleArticleSlugs($user);
+
+        return Category::where('slug', $slug)
+            ->whereHas('articles', fn ($query) => $query->whereIn('slug', $accessibleSlugs))
+            ->firstOrFail();
+    }
+
     private function getAccessibleArticleSlugs(User $user): array
     {
         return $user->getAllPermissions()

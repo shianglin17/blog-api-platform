@@ -28,4 +28,17 @@ class CategoryController extends Controller
             message: 'Categories retrieved successfully'
         );
     }
+
+    public function show(string $slug, Request $request): JsonResponse
+    {
+        $category = $this->categoryService->getCategory(
+            $request->user(),
+            $slug
+        );
+
+        return ApiResponse::success(
+            data: $category,
+            message: 'Category retrieved successfully'
+        );
+    }
 }
