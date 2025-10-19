@@ -29,3 +29,7 @@ Thumbs.db
 **/caddy
 frankenphp
 frankenphp-worker.php
+
+# L5 Swagger 自動生成的檔案
+/storage/api-docs/
+/resources/views/vendor/l5-swagger/
