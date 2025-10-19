@@ -52,21 +52,24 @@
 
 ## 模組 2：文章 (Feature/Article/)
 
-### ArticleListTest.php - GET /api/articles
-**功能**：獲取用戶有權限的文章列表
+### ArticleListTest.php - GET /api/articles?category={slug}
+**功能**：獲取用戶有權限的文章列表（分頁，可選分類過濾）
 
 測試案例：
-- [ ] 用戶可以查看有權限的文章列表（創建 3 篇文章，用戶只有 2 篇權限，只返回 2 篇）
-- [ ] 結構測試（包含 id, title, slug, description, category, created_at）
+- [ ] normal 角色可以看到 3 篇文章（第一頁顯示全部，因為少於 15 篇）
+- [ ] silver 角色可以看到 6 篇文章
+- [ ] gold 角色可以看到 9 篇文章
+- [ ] 使用 category 參數過濾（normal 查詢 ?category=frontend 返回 3 篇）
+- [ ] 分頁結構正確（meta 包含 current_page, last_page, per_page, total）
+- [ ] 文章結構正確（id, title, slug, description, category, created_at，不含 content）
 - [ ] 未認證用戶無法訪問（401）
-- [ ] 無權限的用戶返回空列表（200，空陣列）
 
 ### ArticleDetailTest.php - GET /api/articles/{slug}
 **功能**：獲取文章詳情
 
 測試案例：
-- [ ] 用戶可以查看有權限的文章詳情（200，返回完整文章資訊）
-- [ ] 用戶無法查看無權限的文章（403，返回錯誤訊息）
+- [ ] 用戶可以查看有權限的文章詳情（200，返回完整資訊含 content 和 category）
+- [ ] 用戶無法查看無權限的文章（403）
 - [ ] 文章不存在返回 404
 - [ ] 未認證用戶無法訪問（401）
 
@@ -75,19 +78,23 @@
 ## 模組 3：分類 (Feature/Category/)
 
 ### CategoryListTest.php - GET /api/categories
-**功能**：獲取所有分類及用戶可訪問文章計數
+**功能**：獲取有權限文章的分類列表（分頁，只顯示該分類下有可訪問文章的分類）
 
 測試案例：
-- [ ] 用戶可以查看所有分類（返回所有分類）
-- [ ] 結構正確（包含 id, name, slug, accessible_articles_count）
+- [ ] normal 角色只能看到 1 個分類（前端）
+- [ ] silver 角色可以看到 2 個分類（前端、後端）
+- [ ] gold 角色可以看到 3 個分類（前端、後端、生活）
+- [ ] 分頁結構正確（meta 包含 current_page, last_page, per_page, total）
+- [ ] 分類結構正確（id, name, slug, description, accessible_articles_count）
+- [ ] accessible_articles_count 計算正確（normal 角色：前端=3）
 - [ ] 未認證用戶無法訪問（401）
 
 ### CategoryDetailTest.php - GET /api/categories/{slug}
-**功能**：獲取分類詳情及該分類下用戶可訪問的文章
+**功能**：獲取分類詳細資訊（不含文章列表）
 
 測試案例：
-- [ ] 用戶可以查看分類詳情（200，返回分類資訊）
-- [ ] 只返回用戶有權限的文章（分類下有 3 篇文章，用戶只有 1 篇權限，只返回 1 篇）
-- [ ] 文章列表支持分頁
+- [ ] 用戶可以查看有權限的分類詳情（200，返回 id, name, slug, description, timestamps）
+- [ ] 用戶無權限的分類返回 404（normal 查看後端分類 → 404，因為沒有該分類文章權限）
 - [ ] 分類不存在返回 404
+- [ ] 未認證用戶無法訪問（401）
 
