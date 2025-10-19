@@ -65,6 +65,13 @@ class AuthService
         ];
     }
 
+    public function logout(User $user): void
+    {
+        $user->refreshTokens()->delete();
+
+        $user->currentAccessToken()->delete();
+    }
+
     private function createRefreshToken(User $user): string
     {
         $plainToken = Str::random(64);

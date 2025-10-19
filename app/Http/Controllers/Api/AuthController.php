@@ -9,6 +9,7 @@ use App\Http\Responses\ApiResponse;
 use App\Services\AuthService;
 use Illuminate\Auth\AuthenticationException;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Request;
 
 class AuthController extends Controller
 {
@@ -55,6 +56,30 @@ class AuthController extends Controller
                 'token_type' => 'Bearer',
             ],
             message: 'Token refreshed successfully'
+        );
+    }
+
+    public function profile(Request $request): JsonResponse
+    {
+        $user = $request->user();
+
+        return ApiResponse::success(
+            data: [
+                'name' => $user->name,
+                'email' => $user->email,
+                'role' => $user->roles->first()?->name,
+            ],
+            message: 'Profile retrieved successfully'
+        );
+    }
+
+    public function logout(Request $request): JsonResponse
+    {
+        $this->authService->logout($request->user());
+
+        return ApiResponse::success(
+            data: null,
+            message: 'Logged out successfully'
         );
     }
 }
