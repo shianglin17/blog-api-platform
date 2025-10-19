@@ -2,7 +2,7 @@
 
 namespace App\Http\Responses;
 
-use Illuminate\Contracts\Pagination\LengthAwarePaginator;
+use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Http\JsonResponse;
 
 class ApiResponse
