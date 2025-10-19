@@ -4,7 +4,9 @@ services:
     ports:
       - "8000:8000"
     volumes:
+      - .:/app
       - ./.env:/app/.env
     environment:
       - APP_ENV=local
       - APP_DEBUG=true
+    entrypoint: ["php", "artisan", "octane:frankenphp", "--host=0.0.0.0", "--port=8000", "--workers=1", "--watch"]
