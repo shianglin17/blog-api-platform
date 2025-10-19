@@ -4,7 +4,7 @@ namespace App\Services;
 
 use App\Models\Category;
 use App\Models\User;
-use Illuminate\Contracts\Pagination\LengthAwarePaginator;
+use Illuminate\Pagination\LengthAwarePaginator;
 
 class CategoryService
 {
@@ -13,7 +13,7 @@ class CategoryService
         $accessibleSlugs = $this->getAccessibleArticleSlugs($user);
 
         if (empty($accessibleSlugs)) {
-            return Category::where('id', '<', 0)->paginate($perPage);
+            return new LengthAwarePaginator([], 0, $perPage);
         }
 
         return Category::whereHas('articles', fn ($query) => $query->whereIn('slug', $accessibleSlugs))
