@@ -30,8 +30,8 @@
 **功能**：獲取當前用戶資料
 
 測試案例：
-- [ ] 認證用戶可以獲取個人資料（200，返回 name, email, roles）
-- [ ] 未認證用戶無法訪問（401）
+- [x] 認證用戶可以獲取個人資料（200，返回 name, email, role）
+- [x] 未認證用戶無法訪問（401）
 
 ### RefreshTokenTest.php - POST /api/refresh-token
 **功能**：刷新訪問 token
@@ -45,8 +45,8 @@
 **功能**：登出並刪除 token
 
 測試案例：
-- [ ] 認證用戶可以登出（200，refresh_token 從資料庫刪除）
-- [ ] 未認證用戶無法登出（401）
+- [x] 認證用戶可以登出（200，refresh_token 和 access_token 從資料庫刪除）
+- [x] 未認證用戶無法登出（401）
 
 ---
 
