@@ -5,6 +5,7 @@ namespace App\Services;
 use App\Models\Article;
 use App\Models\User;
 use Illuminate\Pagination\LengthAwarePaginator;
+use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 
 class ArticleService
 {
@@ -21,6 +22,21 @@ class ArticleService
             ->when($categorySlug, fn($q) => $q->whereHas('category', fn($q) => $q->where('slug', $categorySlug)))
             ->orderBy('id')
             ->paginate($perPage);
+    }
+
+    public function getArticle(User $user, string $slug): Article
+    {
+        $article = Article::where('slug', $slug)
+            ->with('category')
+            ->firstOrFail();
+
+        $hasPermission = $user->hasPermissionTo("article.{$slug}");
+
+        if (!$hasPermission) {
+            throw new AccessDeniedHttpException();
+        }
+
+        return $article;
     }
 
     private function getAccessibleArticleSlugs(User $user): array

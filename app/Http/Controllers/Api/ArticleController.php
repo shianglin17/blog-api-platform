@@ -30,4 +30,17 @@ class ArticleController extends Controller
             message: 'Articles retrieved successfully'
         );
     }
+
+    public function show(string $slug, Request $request): JsonResponse
+    {
+        $article = $this->articleService->getArticle(
+            $request->user(),
+            $slug
+        );
+
+        return ApiResponse::success(
+            data: $article,
+            message: 'Article retrieved successfully'
+        );
+    }
 }
