@@ -2,6 +2,7 @@
 
 namespace App\Http\Responses;
 
+use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Http\JsonResponse;
 
 class ApiResponse
@@ -18,6 +19,24 @@ class ApiResponse
             'code'    => $code,
             'message' => $message,
         ];
+
+        if ($data instanceof LengthAwarePaginator) {
+            $response['data'] = $data->items();
+            $response['meta'] = [
+                'current_page' => $data->currentPage(),
+                'from' => $data->firstItem(),
+                'last_page' => $data->lastPage(),
+                'per_page' => $data->perPage(),
+                'to' => $data->lastItem(),
+                'total' => $data->total(),
+            ];
+            $response['links'] = [
+                'first' => $data->url(1),
+                'last' => $data->url($data->lastPage()),
+                'prev' => $data->previousPageUrl() ?? '',
+                'next' => $data->nextPageUrl() ?? '',
+            ];
+        }
 
         return response()->json($response, $httpStatus);
     }

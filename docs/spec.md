@@ -19,11 +19,13 @@
 ### 一般使用者權限(使用 api)：
  - 認證 *4
     - login, refresh token, logout, profile
- - 文章 *2 (需要 SEO 欄位)
-   - list(只顯示有權限的文章), show
- - 分類 *2 (需要 SEO 欄位)
-   - list(只顯示有權限的分類，判斷是否有), show
- - **所有 API 都需要 token 認證(除了 login)**
+ - 分類 *2
+   - list(只顯示該分類下有權限文章的分類，分頁)
+   - show(分類詳細資訊，無權限文章的分類視為不存在 404)
+ - 文章 *2
+   - list(只顯示有權限的文章，支援分類過濾，分頁)
+   - show(文章詳情含 content，需權限檢查)
+ - **所有 API 都需要 token 認證(除了 login 和 refresh-token)**
 
 ---
 ## 資料需求
@@ -101,17 +103,19 @@
  - /api/profile (personal_access_token)
  - /api/logout (personal_access_token)
 ### 分類
- - /api/category/list (personal_access_token)
- - /api/category/{slug} (personal_access_token)
+ - /api/categories (personal_access_token, 分頁) - 返回有權限文章的分類列表 + accessible_articles_count
+ - /api/categories/{slug} (personal_access_token) - 返回分類詳細資訊（description 等）
 ### 文章
- - /api/article/list (personal_access_token)
- - /api/article/{slug} (personal_access_token)
+ - /api/articles?category={slug} (personal_access_token, 分頁) - 返回有權限的文章列表，可選分類過濾
+ - /api/articles/{slug} (personal_access_token) - 返回文章詳情（含 content）
 
 ---
 ## 權限實作
  - 以最細權限為主（文章）
- - ArticleObserver 在 Create, edit, delete 時同步權限
- - slug 更新時先移除舊權限，再建立新權限）
+ - **在 Filament Article Resource 的 hook 處理權限同步**：
+   - `afterCreate`: 建立文章時，自動建立對應權限 `article.{slug}`
+   - `afterUpdate`: 更新文章 slug 時，刪除舊權限，建立新權限
+   - `afterDelete`: 刪除文章時，刪除對應權限
  - 以 article.{slug} 作為 permission->name 作為權限命名
  - 建立 User 的時候，也需要給予角色（Role）
  - **後台操作釐清**：在 Filament UI 中，透過分類進行的批量勾選僅為前端操作輔助，最終提交至後端的請求，皆為針對單一文章顆粒度的權限指派。
