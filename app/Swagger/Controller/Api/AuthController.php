@@ -9,7 +9,6 @@ class AuthController
     #[OA\Post(
         path: '/login',
         summary: '用戶登入',
-        tags: ['Auth'],
         requestBody: new OA\RequestBody(
             required: true,
             content: new OA\JsonContent(
@@ -20,6 +19,7 @@ class AuthController
                 ]
             )
         ),
+        tags: ['Auth'],
         responses: [
             new OA\Response(
                 response: 200,
@@ -60,7 +60,6 @@ class AuthController
     #[OA\Post(
         path: '/refresh-token',
         summary: '刷新訪問 token',
-        tags: ['Auth'],
         requestBody: new OA\RequestBody(
             required: true,
             content: new OA\JsonContent(
@@ -70,6 +69,7 @@ class AuthController
                 ]
             )
         ),
+        tags: ['Auth'],
         responses: [
             new OA\Response(
                 response: 200,
@@ -151,7 +151,6 @@ class AuthController
                 description: '登出成功',
                 content: new OA\JsonContent(
                     properties: [
-                        new OA\Property(property: 'data', type: 'null'),
                         new OA\Property(property: 'success', type: 'boolean', example: true),
                         new OA\Property(property: 'code', type: 'string', example: '0200'),
                         new OA\Property(property: 'message', type: 'string', example: 'Logout successful'),
